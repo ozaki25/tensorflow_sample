@@ -1,0 +1,7 @@
+{
+  "name": "tensorflow_sample",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "ozaki <fs65ugumori@yahoo.co.jp>",
+  "license": "MIT"
+}
