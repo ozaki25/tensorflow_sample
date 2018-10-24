@@ -1,8 +1,5 @@
-import hello from './hello';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
 
-async function main() {
-  const result = await hello();
-  document.getElementById('root').textContent = result;
-}
-
-main();
+ReactDOM.render(<App />, document.getElementById('root'));
