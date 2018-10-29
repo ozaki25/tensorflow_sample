@@ -1,9 +1,6 @@
 import React from 'react';
+import Router from './router';
 
-const App = () => (
-  <div>
-    <h1>Hello</h1>
-  </div>
-);
+const App = () => <Router />;
 
 export default App;

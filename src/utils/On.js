@@ -1,6 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
 import yolo, { downloadModel } from 'tfjs-yolo-tiny';
-import * as Comlink from 'comlinkjs';
 import { Webcam } from '../libs/webcam';
 
 const webcamElem = document.getElementById('webcam');
@@ -45,22 +44,19 @@ function execYolo(inputImage, model) {
   };
 }
 
-async function main() {
-  const WorkerFunc = Comlink.proxy(new Worker('../workers/WorkerFunc.js'));
+export default async function main() {
   const webcam = new Webcam(webcamElem);
   await webcam.setup();
   const model = await downloadModel();
   // alert('モデルの読み込みが完了しました');
   doneLoading();
-  // setInterval(async () => {
-  while (true) {
+  setInterval(async () => {
+    // while (true) {
     clearRects();
     const inputImage = webcam.capture();
-    const boxes = await WorkerFunc(Comlink.proxyValue(execYolo(inputImage, model)));
+    const boxes = await execYolo(inputImage, model)();
     boxes.forEach(drawRect);
-    await WorkerFunc(Comlink.proxyValue(tf.nextFrame));
-  }
-  // }, 1000);
+    await tf.nextFrame();
+    // }
+  }, 500);
 }
-
-main();
