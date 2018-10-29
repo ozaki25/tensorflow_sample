@@ -6,12 +6,11 @@ import { Webcam } from '../libs/webcam';
 const webcamElem = document.getElementById('webcam');
 const webcamWrapperElem = document.getElementById('webcam-wrapper');
 
-function drawRect(x, y, w, h, text = '', color = 'red') {
-  console.log('rect', { x, y, w, h, text, color });
+function drawRect({ style, text }) {
   const rect = document.createElement('div');
   const label = document.createElement('div');
   rect.classList.add('rect');
-  rect.style.cssText = `top: ${y}; left: ${x}; width: ${w}; height: ${h}; border-color: ${color}`;
+  rect.style.cssText = style;
   label.classList.add('label');
   label.innerText = text;
   rect.appendChild(label);
@@ -35,8 +34,13 @@ function showError() {
 }
 
 function execYolo(inputImage, model) {
-  return function() {
-    return yolo(inputImage, model);
+  return async function() {
+    const boxes = await yolo(inputImage, model);
+    return boxes.map(({ top, left, bottom, right, classProb, className }) => ({
+      style: `top: ${top}; left: ${left}; width: ${right - left}; height: ${bottom -
+        top}; border-color: red`,
+      text: `${className}: ${Math.round(classProb * 100)}%`,
+    }));
   };
 }
 
@@ -51,16 +55,7 @@ async function main() {
     clearRects();
     const inputImage = webcam.capture();
     const boxes = await Yolo(Comlink.proxyValue(execYolo(inputImage, model)));
-    boxes.forEach(box => {
-      const { top, left, bottom, right, classProb, className } = box;
-      drawRect(
-        left,
-        top,
-        right - left,
-        bottom - top,
-        `${className}: ${Math.round(classProb * 100)}%`,
-      );
-    });
+    boxes.forEach(drawRect);
     await Yolo(Comlink.proxyValue(tf.nextFrame));
   }, 1000);
 }
