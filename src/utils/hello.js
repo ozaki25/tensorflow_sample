@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import yolo, { downloadModel } from 'tfjs-yolo-tiny';
+import * as Comlink from 'comlinkjs';
 import { Webcam } from '../libs/webcam';
 
 const webcamElem = document.getElementById('webcam');
@@ -33,35 +34,35 @@ function showError() {
   doneLoading();
 }
 
-// worker(webcamElem, drawRect, clearRects, doneLoading).catch(showError);
-
-const worker = new Worker('worker.js');
-
-const main = async () => {
-  const webcam = new Webcam(webcamElem);
-  const model = await downloadModel();
-  alert('モデルの読み込みが完了しました');
-  // await webcam.setup();
-  doneLoading();
-  const body = JSON.stringify({ model, tf, yolo: yolo.toString(), webcam });
-  worker.postMessage({ type: 'run', body });
-};
-
-function router({ data }) {
-  console.log(data);
-  const { type, body } = data;
-  switch (type) {
-    case 'clearRects':
-      clearRects();
-      break;
-    case 'drawRect':
-      run(body);
-      break;
-    default:
-      console.log('default');
-  }
+function execYolo(inputImage, model) {
+  return function() {
+    return yolo(inputImage, model);
+  };
 }
 
-worker.addEventListener('message', router);
+async function main() {
+  const Yolo = Comlink.proxy(new Worker('../workers/Yolo.js'));
+  const webcam = new Webcam(webcamElem);
+  await webcam.setup();
+  const model = await downloadModel();
+  // alert('モデルの読み込みが完了しました');
+  doneLoading();
+  setInterval(async () => {
+    clearRects();
+    const inputImage = webcam.capture();
+    const boxes = await Yolo(Comlink.proxyValue(execYolo(inputImage, model)));
+    boxes.forEach(box => {
+      const { top, left, bottom, right, classProb, className } = box;
+      drawRect(
+        left,
+        top,
+        right - left,
+        bottom - top,
+        `${className}: ${Math.round(classProb * 100)}%`,
+      );
+    });
+    await Yolo(Comlink.proxyValue(tf.nextFrame));
+  }, 1000);
+}
 
 main();
