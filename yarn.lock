@@ -1331,6 +1331,11 @@ colors@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.1.2.tgz#168a4701756b6a7f51a12ce0c97bfa28c084ed63"
 
+comlinkjs@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/comlinkjs/-/comlinkjs-3.0.3.tgz#a976952d9368e5e8c1d6c0ba78f3a9a70df797ed"
+  integrity sha512-FN2s2DVXYaSvYYPGyl+cDD2b6S9i+cyqBndKW2qd63G1kL9blX7uwf+OAQE9xabB+ciTlIV/jDoquVImeb5tJg==
+
 command-exists@^1.2.6:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/command-exists/-/command-exists-1.2.8.tgz#715acefdd1223b9c9b37110a149c6392c2852291"
