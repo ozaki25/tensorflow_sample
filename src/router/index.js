@@ -5,7 +5,7 @@ import Off from '../components/Off';
 import On from '../components/On';
 
 export default () => (
-  <BrowserRouter>
+  <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Switch>
       <Route path="/" exact component={Home} />
       <Route path="/off-the-main-thread" exact component={Off} />
