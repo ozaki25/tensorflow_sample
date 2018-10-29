@@ -7,6 +7,7 @@ const webcamElem = document.getElementById('webcam');
 const webcamWrapperElem = document.getElementById('webcam-wrapper');
 
 function drawRect({ style, text }) {
+  console.log({ style, text });
   const rect = document.createElement('div');
   const label = document.createElement('div');
   rect.classList.add('rect');
@@ -45,19 +46,21 @@ function execYolo(inputImage, model) {
 }
 
 async function main() {
-  const Yolo = Comlink.proxy(new Worker('../workers/Yolo.js'));
+  const WorkerFunc = Comlink.proxy(new Worker('../workers/WorkerFunc.js'));
   const webcam = new Webcam(webcamElem);
   await webcam.setup();
   const model = await downloadModel();
   // alert('モデルの読み込みが完了しました');
   doneLoading();
-  setInterval(async () => {
+  // setInterval(async () => {
+  while (true) {
     clearRects();
     const inputImage = webcam.capture();
-    const boxes = await Yolo(Comlink.proxyValue(execYolo(inputImage, model)));
+    const boxes = await WorkerFunc(Comlink.proxyValue(execYolo(inputImage, model)));
     boxes.forEach(drawRect);
-    await Yolo(Comlink.proxyValue(tf.nextFrame));
-  }, 1000);
+    await WorkerFunc(Comlink.proxyValue(tf.nextFrame));
+  }
+  // }, 1000);
 }
 
 main();
