@@ -12,7 +12,8 @@
     "@tensorflow/tfjs": "^0.13.2",
     "@tensorflow/tfjs-node": "^0.1.19",
     "react": "^16.6.0",
-    "react-dom": "^16.6.0"
+    "react-dom": "^16.6.0",
+    "tfjs-yolo-tiny": "^1.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
