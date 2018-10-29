@@ -2,44 +2,8 @@ import * as tf from '@tensorflow/tfjs';
 import yolo, { downloadModel } from 'tfjs-yolo-tiny';
 import { Webcam } from '../libs/webcam';
 
-let model;
-const webcam = new Webcam(document.getElementById('webcam'));
-const webcamElem = document.getElementById('webcam-wrapper');
-
-(async function main() {
-  try {
-    model = await downloadModel();
-    alert('モデルの読み込みが完了しました');
-    await webcam.setup();
-    doneLoading();
-    run();
-  } catch (e) {
-    console.error(e);
-    showError();
-  }
-})();
-
-async function run() {
-  setInterval(async () => {
-    clearRects();
-    const inputImage = webcam.capture();
-    const t0 = performance.now();
-    const boxes = await yolo(inputImage, model);
-    const t1 = performance.now();
-    console.log(`YOLO inference took ${t1 - t0} milliseconds.`);
-    boxes.forEach(box => {
-      const { top, left, bottom, right, classProb, className } = box;
-      drawRect(
-        left,
-        top,
-        right - left,
-        bottom - top,
-        `${className}: ${Math.round(classProb * 100)}%`,
-      );
-    });
-    await tf.nextFrame();
-  }, 1000);
-}
+const webcamElem = document.getElementById('webcam');
+const webcamWrapperElem = document.getElementById('webcam-wrapper');
 
 function drawRect(x, y, w, h, text = '', color = 'red') {
   console.log('rect', { x, y, w, h, text, color });
@@ -50,7 +14,7 @@ function drawRect(x, y, w, h, text = '', color = 'red') {
   label.classList.add('label');
   label.innerText = text;
   rect.appendChild(label);
-  webcamElem.appendChild(rect);
+  webcamWrapperElem.appendChild(rect);
 }
 
 function clearRects() {
@@ -61,11 +25,43 @@ function clearRects() {
 }
 
 function doneLoading() {
-  const webcam = document.getElementById('webcam-wrapper');
-  webcam.style.display = 'flex';
+  webcamWrapperElem.style.display = 'flex';
 }
 
 function showError() {
   alert('loading error');
   doneLoading();
 }
+
+// worker(webcamElem, drawRect, clearRects, doneLoading).catch(showError);
+
+const worker = new Worker('worker.js');
+
+const main = async () => {
+  const webcam = new Webcam(webcamElem);
+  const model = await downloadModel();
+  alert('モデルの読み込みが完了しました');
+  // await webcam.setup();
+  doneLoading();
+  const body = JSON.stringify({ model, tf, yolo: yolo.toString(), webcam });
+  worker.postMessage({ type: 'run', body });
+};
+
+function router({ data }) {
+  console.log(data);
+  const { type, body } = data;
+  switch (type) {
+    case 'clearRects':
+      clearRects();
+      break;
+    case 'drawRect':
+      run(body);
+      break;
+    default:
+      console.log('default');
+  }
+}
+
+worker.addEventListener('message', router);
+
+main();
