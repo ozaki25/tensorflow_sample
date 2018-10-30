@@ -9,7 +9,7 @@ export default () => (
   <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Switch>
       <Route path="/" exact component={Home} />
-      <Route path="/only-video" exact component={Video} />
+      <Route path="/only-webcam" exact component={Video} />
       <Route path="/off-the-main-thread" exact component={Off} />
       <Route path="/on-the-main-thread" exact component={On} />
     </Switch>

@@ -9,6 +9,9 @@ const Home = () => (
     <p>
       <Link to="/on-the-main-thread">On the main thread</Link>
     </p>
+    <p>
+      <Link to="/only-webcam">Only Webcam</Link>
+    </p>
   </div>
 );
 
