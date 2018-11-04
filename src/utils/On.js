@@ -58,5 +58,5 @@ export default async function main() {
     boxes.forEach(drawRect);
     await tf.nextFrame();
     // }
-  }, 500);
+  }, 3000);
 }

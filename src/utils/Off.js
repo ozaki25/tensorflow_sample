@@ -36,6 +36,7 @@ function showError() {
 
 function execYolo(inputImage, model) {
   return async function() {
+    console.log('start yolo', new Date());
     const boxes = await yolo(inputImage, model);
     return boxes.map(({ top, left, bottom, right, classProb, className }) => ({
       style: `top: ${top}; left: ${left}; width: ${right - left}; height: ${bottom -
@@ -60,5 +61,5 @@ export default async function main() {
     boxes.forEach(drawRect);
     await WorkerFunc(Comlink.proxyValue(tf.nextFrame));
     // }
-  }, 500);
+  }, 3000);
 }
