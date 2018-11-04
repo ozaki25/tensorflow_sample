@@ -59,7 +59,7 @@ export default async function main() {
     const boxes = await WorkerFunc(Comlink.proxyValue(execYolo(inputImage, model)));
     clearRects();
     boxes.forEach(drawRect);
-    await WorkerFunc(Comlink.proxyValue(tf.nextFrame));
+    // await WorkerFunc(Comlink.proxyValue(tf.nextFrame));
     // }
   }, 3000);
 }
