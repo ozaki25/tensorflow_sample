@@ -55,9 +55,9 @@ export default async function main() {
   doneLoading();
   setInterval(async () => {
     // while (true) {
-    clearRects();
     const inputImage = webcam.capture();
     const boxes = await WorkerFunc(Comlink.proxyValue(execYolo(inputImage, model)));
+    clearRects();
     boxes.forEach(drawRect);
     await WorkerFunc(Comlink.proxyValue(tf.nextFrame));
     // }
